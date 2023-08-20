@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Races;
+use App\Models\Activities;
 use App\Models\Race_registrations;
 use Illuminate\Support\Facades\DB;
 
@@ -153,8 +154,8 @@ class RacesController extends Controller
         $userRaces = DB::table('races')
             ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
             ->join('users', 'race_registrations.user_id', '=', 'users.id')
-            ->join('races', 'races.race_ids', '=', 'races.id')
-            ->select('races.races_kilometers', 'races.race_name', 'races.race_finishkilometer',DB::raw('races.races_kilometers / races.race_finishkilometer * 100 AS progress_races'))
+            ->join('activities', 'races.id', '=', 'activities.race_ids')
+            ->select('activities.activity_kilometers', 'races.race_name', 'races.race_finishkilometer',DB::raw('activities.activity_kilometers / races.race_finishkilometer * 100 AS progress_races'))
             ->where('users.id', $user->id)
             ->get();
 

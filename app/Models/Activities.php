@@ -41,4 +41,9 @@ class Activities extends Model
     {
         return $this->belongsTo(User::class, 'id');
     } 
+
+    public function races()
+    {
+        return $this->hasMany(Races::class, 'id');
+    }
 }

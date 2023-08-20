@@ -39,4 +39,9 @@ class Races extends Model
     {
         return $this->belongsToMany(Race_registrations::class, 'race_registrations', 'user_id', 'race_id');
     }
+
+    public function activities()
+    {
+        return $this->belogsTo(Activities::class, 'race_ids');
+    }
 }
