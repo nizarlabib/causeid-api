@@ -76,7 +76,7 @@ class ActivitiesController extends Controller
         $user = Auth::guard('api')->user();
 
         $activities =   DB::table('activities')
-                        ->join('races', 'races.id', '=', 'activities.race_ids')
+                        ->leftjoin('races', 'races.id', '=', 'activities.race_ids')
                         ->select('activities.*', 'races.race_name')
                         ->where('user_id', $user->id)
                         ->get();
