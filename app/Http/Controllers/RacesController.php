@@ -101,6 +101,13 @@ class RacesController extends Controller
                 'message' => 'race not found'
             ]);
         }
+
+        $race->race_picture = str_replace(
+            'C:\\Users\\ASUS\\Desktop\\tes-magang\\causeid-api\\public/images/',
+            'http://127.0.0.1:8000/images/',
+            $race->race_picture
+        );
+        
         return response()->json([
             'status' => 'success',
             'data' => $race
@@ -117,6 +124,14 @@ class RacesController extends Controller
             ->select('races.*')
             ->where('users.id', $user->id)
             ->get();
+        
+            foreach ($userRaces as $race) {
+                $race->race_picture = str_replace(
+                    'C:\\Users\\ASUS\\Desktop\\tes-magang\\causeid-api\\public/images/',
+                    'http://127.0.0.1:8000/images/',
+                    $race->race_picture
+                );
+            }
 
         return response()->json([
             'success' => true,
@@ -158,6 +173,7 @@ class RacesController extends Controller
             ->select('races.id as race_id', 'races.race_name', 'races.race_finishkilometer', 
                     DB::raw('SUM(activities.activity_kilometers) AS total_kilometers'))
             ->where('users.id', $user->id)
+            ->where('activities.user_id', $user->id)
             ->groupBy('races.id', 'races.race_name', 'races.race_finishkilometer')
             ->get();
 
