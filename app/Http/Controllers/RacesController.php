@@ -155,9 +155,15 @@ class RacesController extends Controller
             ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
             ->join('users', 'race_registrations.user_id', '=', 'users.id')
             ->join('activities', 'races.id', '=', 'activities.race_ids')
-            ->select('activities.activity_kilometers', 'races.race_name', 'races.race_finishkilometer',DB::raw('activities.activity_kilometers / races.race_finishkilometer * 100 AS progress_races'))
+            ->select('races.id as race_id', 'races.race_name', 'races.race_finishkilometer', 
+                    DB::raw('SUM(activities.activity_kilometers) AS total_kilometers'))
             ->where('users.id', $user->id)
+            ->groupBy('races.id', 'races.race_name', 'races.race_finishkilometer')
             ->get();
+
+        foreach ($userRaces as $race) {
+            $race->progress_races = ($race->total_kilometers / $race->race_finishkilometer) * 100;
+        }
 
         if (!$userRaces) {
             return response()->json([
