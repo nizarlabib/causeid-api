@@ -23,8 +23,8 @@ class CreateActivitiesTable extends Migration
             $table->integer('activity_minutes');
             $table->integer('activity_seconds');
             $table->datetime('activity_datetime');
-            $table->string('race_ids')->unsigned()->nullable();
-            $table->foreignId('user_id')->unsigned();
+            $table->string('race_ids')->nullable();
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }
