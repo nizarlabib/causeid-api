@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RacesController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Races;
 use App\Models\Activities;
 use App\Models\Race_registrations;
+use App\Models\Activity_races;
 use Illuminate\Support\Facades\DB;
 
 class ActivitiesController extends Controller
@@ -20,11 +22,10 @@ class ActivitiesController extends Controller
      * @param  int  $id
      * @return \Illuminate\View\View
      */
-
-
+     
      public function createActivities(Request $request)
      {
-         $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
              'activity_picture' => 'image|mimes:svg,jpeg,png,jpg,gif|max:2048',
          ]);
  
@@ -45,7 +46,7 @@ class ActivitiesController extends Controller
          $activities->activity_minutes = $request->input('activity_minutes');
          $activities->activity_seconds = $request->input('activity_seconds');
          $activities->activity_datetime = $request->input('activity_datetime');
-         $activities->race_ids = $request->input('race_ids');
+        //  $activities->race_ids = $request->race_ids;
          $activities->user_id = $user->id;
  
          if ($request->hasFile('activity_picture')) {
@@ -55,13 +56,35 @@ class ActivitiesController extends Controller
              $activities->activity_picture = $this->getPublicPath('images/'.$imageName);
          }
  
-         $activities->save();
- 
+        $activities->save();
+
+        $userRaces = DB::table('races')
+            ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
+            ->join('users', 'race_registrations.user_id', '=', 'users.id')
+            ->select('races.*')
+            ->where('users.id', $user->id)
+            ->get();
+
+        $userRacesIds = [];
+
+        foreach($userRaces as $userRace){
+            if ($activities->activity_datetime > $userRace->race_activitystartdatetime &&                   $activities->activity_datetime < $userRace->race_activityenddatetime) {
+                array_push($userRacesIds, $userRace->id);                       
+            }
+        };
+
+        if ($userRacesIds) {
+            foreach($userRacesIds as $userRaceId){
+                $activityRaces = $this->addActivtyRaces($activities->id, $userRaceId->id);                
+            };
+        }
+            
          return response()->json([
              'success' => true,
              'message' => 'New activities created',
              'data' => [
-                 'activities' => $activities
+                 'activities' => $activities,
+                //  'activityraces' => $activityRaces
              ]
          ]);
      }
@@ -71,12 +94,23 @@ class ActivitiesController extends Controller
          return rtrim(app()->basePath('public/' . $path), '/');
      }
 
+     public function addActivtyRaces($idactivity, $idraces)
+    {
+        $activityraces = Activity_races::create([
+            'activity_id' => $idactivity,
+            'race_id' => $idraces
+        ]);
+
+        return response()->json($activityraces);
+    }
+
     public function getAllUserActivities()
     {
         $user = Auth::guard('api')->user();
 
         $activities =   DB::table('activities')
-                        ->leftjoin('races', 'races.id', '=', 'activities.race_ids')
+                        ->leftjoin('activity_races', 'activity_races.activity_id', '=', 'activities.id')
+                        ->leftjoin('races', 'races.id', '=', 'activity_races.race_id')
                         ->select('activities.*', 'races.race_name')
                         ->where('user_id', $user->id)
                         ->get();

@@ -8,6 +8,7 @@ use Laravel\Lumen\Http\Request as HttpRequest;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RacesController;
 use App\Http\Controllers\ActivitiesController;
+use App\Http\Controllers\PDFController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,17 +41,22 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/create', [RacesController::class, 'createRaces']);
         Route::get('/{id}', [RacesController::class, 'getRaceById']);
         Route::get('/user/races', [RacesController::class, 'getUserRaces']);
+        Route::get('/user/races/{id}', [RacesController::class, 'getUserRaceById']);
         Route::get('/user/status', [RacesController::class, 'cekStatusUserRaces']);
         Route::post('/user/joinrace', [RacesController::class, 'joinRace']);
         Route::get('/user/progres', [RacesController::class, 'getProgressUserRaces']);
+        // Route::get('/user/generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+        
     });
-
+    
     Route::prefix('activities')->group(function () {
         Route::get('/', [ActivitiesController::class, 'getAllUserActivities']);
         Route::post('/create', [ActivitiesController::class, 'createActivities']);
         Route::post('/delete/{id}', [ActivitiesController::class, 'delUserActivities']);
     });
 });
+
+Route::get('/races/user/generate-pdf/', [PDFController::class, 'generatePDF']);
 
 
 

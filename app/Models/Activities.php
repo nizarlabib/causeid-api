@@ -46,4 +46,9 @@ class Activities extends Model
     {
         return $this->hasMany(Races::class, 'id');
     }
+
+    public function activityraces()
+    {
+        return $this->belongsToMany(Activity_races::class, 'activity_races', 'activity_id', 'race_id');
+    }
 }

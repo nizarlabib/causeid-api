@@ -169,7 +169,8 @@ class RacesController extends Controller
         $userRaces = DB::table('races')
             ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
             ->join('users', 'race_registrations.user_id', '=', 'users.id')
-            ->join('activities', 'races.id', '=', 'activities.race_ids')
+            ->join('activity_races', 'activity_races.race_id', '=', 'races.id')
+            ->join('activities', 'activities.id', '=', 'activity_races.activity_id')
             ->select('races.id as race_id', 'races.race_name', 'races.race_finishkilometer', 
                     DB::raw('SUM(activities.activity_kilometers) AS total_kilometers'))
             ->where('users.id', $user->id)
