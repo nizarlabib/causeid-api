@@ -15,8 +15,8 @@ class CreateRaceRegistrationsTable extends Migration
     {
         Schema::create('race_registrations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unsigned();
-            $table->foreignId('race_id')->unsigned();
+            $table->foreignId('user_id');
+            $table->foreignId('race_id');
             $table->string('registration_jerseysize');
             $table->timestamps();
         });
