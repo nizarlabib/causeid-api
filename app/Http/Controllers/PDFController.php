@@ -16,14 +16,14 @@ class PDFController extends Controller
      */
     public function generatePDF(Request $request)
     {
-        // $user = Auth::guard('api')->user();
+        $user = Auth::guard('api')->user();
 
         $userRaceData = DB::table('races')
             ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
             ->join('users', 'race_registrations.user_id', '=', 'users.id')
             ->select('races.race_name', 'users.username')
-            ->where('users.id', '1')
-            ->where('races.id', '1')
+            ->where('users.id', $user->id)
+            ->where('races.id', $request->id)
             ->first();
           
         $data = [
@@ -33,9 +33,6 @@ class PDFController extends Controller
 
         $pdf = PDF::loadView('myPDF', $data);
 
-        $pdfPath = tempnam(sys_get_temp_dir(), 'pdf');
-        $pdf->save($pdfPath);
-
-        return response()->file($pdfPath);
+        return $pdf->stream('myPDF');
     }
 }

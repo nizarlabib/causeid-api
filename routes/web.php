@@ -45,7 +45,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/user/status', [RacesController::class, 'cekStatusUserRaces']);
         Route::post('/user/joinrace', [RacesController::class, 'joinRace']);
         Route::get('/user/progres', [RacesController::class, 'getProgressUserRaces']);
-        // Route::get('/user/generate-pdf/{id}', [PDFController::class, 'generatePDF']);
+        Route::get('/user/generate-pdf/{id}', [PDFController::class, 'generatePDF']);
         
     });
     
@@ -56,7 +56,6 @@ Route::middleware(['auth:api'])->group(function () {
     });
 });
 
-Route::get('/races/user/generate-pdf/', [PDFController::class, 'generatePDF']);
 
 
 

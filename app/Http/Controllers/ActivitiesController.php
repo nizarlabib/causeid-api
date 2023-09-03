@@ -61,24 +61,25 @@ class ActivitiesController extends Controller
         $userRaces = DB::table('races')
             ->join('race_registrations', 'races.id', '=', 'race_registrations.race_id')
             ->join('users', 'race_registrations.user_id', '=', 'users.id')
-            ->select('races.*')
+            ->select('races.id')
             ->where('users.id', $user->id)
             ->get();
-
+        
         $userRacesIds = [];
-
-        foreach($userRaces as $userRace){
-            if ($activities->activity_datetime > $userRace->race_activitystartdatetime &&                   $activities->activity_datetime < $userRace->race_activityenddatetime) {
-                array_push($userRacesIds, $userRace->id);                       
+        
+        foreach ($userRaces as $userRace) {
+            if ($activities->activity_datetime > $userRace->race_activitystartdatetime &&
+                $activities->activity_datetime < $userRace->race_activityenddatetime) {
+                array_push($userRacesIds, $userRace->id);
             }
-        };
-
-        if ($userRacesIds) {
-            foreach($userRacesIds as $userRaceId){
-                $activityRaces = $this->addActivtyRaces($activities->id, $userRaceId->id);                
-            };
         }
-            
+        
+        if (!empty($userRacesIds)) {
+            foreach ($userRacesIds as $userRaceId) {
+                $activityRaces = $this->addActivtyRaces($activities->id, $userRaceId);
+            }
+        }
+          
          return response()->json([
              'success' => true,
              'message' => 'New activities created',
